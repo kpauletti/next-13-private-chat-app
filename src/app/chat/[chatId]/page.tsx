@@ -16,7 +16,7 @@ interface ChatPageProps {
 
 type ClientSocket = Socket<ServerToClientEvents, ClientToServerEvents>;
 
-const socketUrl = process.env.NODE_ENV === "development" ? "http://localhost:3000" : '/'
+const socketUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
 export default function ChatPage(props: ChatPageProps) {
 
@@ -43,7 +43,6 @@ export default function ChatPage(props: ChatPageProps) {
         const socket: ClientSocket = io(socketUrl, {
           path: "/api/socket/io",
           addTrailingSlash: false,
-          
         });
 
         socket.onAny((event, ...args) => {
