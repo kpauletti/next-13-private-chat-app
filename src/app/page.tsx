@@ -13,7 +13,7 @@ export default function Home() {
     };
 
     const createChat = () => {
-        void fetch("/api/socket"); //init socket
+
         const chatId = generateRandom10DigitNumber();
         router.push(`/chat/${chatId}?username=${username || "Anonymous"}`);
     };

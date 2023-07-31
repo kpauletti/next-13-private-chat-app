@@ -5,6 +5,11 @@ import type { ServerToClientEvents, ClientToServerEvents } from "@/types/events"
 import * as userStore from '@/utils/userStore';
 import * as messageStore from '@/utils/messageStore';
 
+export const config = {
+    api: {
+      bodyParser: false,
+    }
+  }
 
 const io: NextApiHandlerExtended = async (req, res) => {
 
@@ -12,10 +17,11 @@ const io: NextApiHandlerExtended = async (req, res) => {
 
         // adapt Next's net Server to http Server
         const httpServer: NetServer = res.socket.server as any;
-        const io = new ServerIO<ServerToClientEvents, ClientToServerEvents>(httpServer, { path: "/api/socket" })
+        //https://socket.io/docs/v4/server-options/#addtrailingslash
+        //@ts-ignore
+        const io = new ServerIO<ServerToClientEvents, ClientToServerEvents>(httpServer, { path: "/api/socket/io", addTrailingSlash: false})
 
         io.on("connection", (socket) => {
-
             socket.onAny((event, ...args) => {
                 console.log(event, args);
             });
@@ -27,7 +33,6 @@ const io: NextApiHandlerExtended = async (req, res) => {
 
             socket.on("message", ({ username, chatId, message }) => {
                 const newMessage = messageStore.addMessage(chatId, message, username)
-                console.log("newMessage", newMessage)
                 io.to(chatId).emit("message", newMessage);
             });
 

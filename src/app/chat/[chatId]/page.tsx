@@ -1,9 +1,7 @@
 "use client"
 import React from "react";
-import { io, Socket } from "socket.io-client";
 import AnimatedButton from "@/components/AnimatedButton";
-import type { Message } from "@/utils/messageStore";
-import type { ServerToClientEvents, ClientToServerEvents } from "@/types/events";
+import useSocket from "@/app/hooks/useSocket";
 
 interface ChatPageProps {
     params: {
@@ -14,61 +12,26 @@ interface ChatPageProps {
     }
 }
 
-type ClientSocket = Socket<ServerToClientEvents, ClientToServerEvents>;
-
-const socketUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
 export default function ChatPage(props: ChatPageProps) {
 
     const { chatId } = props.params;
 
     const [inputValue, setInputValue] = React.useState("")
-    const [messages, setMessages] = React.useState<Message[]>([])
-    const [activeSocket, setActiveSocket] = React.useState<ClientSocket | null>(null)
     const inputRef = React.useRef<HTMLInputElement>(null)
     const messageEndRef = React.useRef<HTMLDivElement>(null)
 
     const username = props.searchParams?.username || "Anonymous";
 
+    const { socket, messages } = useSocket({ username, chatId });
+
     const handleSendMessage = async () => {
-        if(activeSocket?.connected && inputValue){
-            activeSocket?.emit("message", { username, chatId, message: inputValue })
+        if(socket?.connected && inputValue){
+            socket?.emit("message", { username, chatId, message: inputValue })
             setInputValue("")
             inputRef.current?.focus()
         }
     }
-
-    React.useEffect((): any => {
-
-        const socket: ClientSocket = io(socketUrl, {
-          path: "/api/socket/io",
-          addTrailingSlash: false,
-        });
-
-        socket.onAny((event, ...args) => {
-            console.log(event, args);
-        });
-
-        socket.on("connect", () => {
-            socket.emit("join", { username, chatId });
-            //join room will take a cb to set messages
-            socket.emit("joinRoom", { chatId }, (messages) => {
-                setMessages(messages)
-            });
-            setActiveSocket(socket)
-        });
-
-        socket.on('message', (message) => {
-            setMessages((prev) => [...prev, message])
-        })
-
-        socket.on("disconnect", () => {
-            socket.emit("leaveRoom", { chatId });
-            setActiveSocket(null)
-        });
-    
-        if (socket) return () => socket.disconnect();
-      }, []);
 
     React.useEffect(() => {
         messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
