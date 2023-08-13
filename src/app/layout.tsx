@@ -12,7 +12,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${monsterrat.className}  bg-slate-800`}>{children}</body>
+      <body className={`${monsterrat.className}`}>{children}</body>
     </html>
   )
 }

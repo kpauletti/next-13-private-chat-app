@@ -1,35 +1,22 @@
-"use client";
 import React from "react";
-import AnimatedButton from "@/components/AnimatedButton";
-import { generateRandom10DigitNumber } from "@/utils";
-import { useRouter } from "next/navigation";
+import ChatForm from "@/components/ChatForm";
 
 export default function Home() {
-    const router = useRouter();
-    const [username, setUsername] = React.useState<string>("");
-
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setUsername(e.target.value);
-    };
-
-    const createChat = () => {
-
-        const chatId = generateRandom10DigitNumber();
-        router.push(`/chat/${chatId}?username=${username || "Anonymous"}`);
-    };
 
     return (
-        <div className="h-screen px-20 flex flex-col justify-center items-center gap-10">
-            <input
-                className="w-full lg:w-1/3 text-center rounded-sm p-3"
-                value={username}
-                onChange={handleInputChange}
-                type="text"
-                placeholder="enter username"
-            />
-            <div className="w-full lg:w-1/3">
-                <AnimatedButton onClick={createChat}>CREATE A CHAT</AnimatedButton>
+        <div className="hero min-h-screen bg-base-200">
+            <div className="hero-content flex-col lg:flex-row-reverse">
+                <div className="text-center lg:text-left">
+                    <h1 className="text-5xl font-bold">Private Chat</h1>
+                    <p className="py-6">Create your own private chat room and invite your friends to join.</p>
+                </div>
+                <div className="card flex-shrink-0 min-h-[300px] w-full max-w-sm shadow-2xl bg-base-100">
+                    <div className="card-body flex justify-between">
+                        <ChatForm />
+                    </div>
+                </div>
             </div>
         </div>
+
     );
 }
